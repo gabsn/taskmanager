@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+    "net/http"
 )
 
 type (
@@ -37,7 +38,7 @@ func initConfig() {
 func DisplayAppError(w http.ResponseWriter, handlerError error, message string, code int) {
     errObj := appError{handlerError.Error(), message, code}
     log.Printf("[AppError]: %s\n", handlerError)
-    w.Header.Set("Content-Type", "application/json; charset=utf-8")
+    w.Header().Set("Content-Type", "application/json; charset=utf-8")
     w.WriteHeader(code)
     if j, err := json.Marshal(errorResource{errObj}); err == nil {
         w.Write(j)

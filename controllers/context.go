@@ -1,5 +1,11 @@
 package controllers
 
+import (
+    "gopkg.in/mgo.v2"
+
+    "github.com/gabsn/taskmanager/common"
+)
+
 type Context struct {
     MongoSession *mgo.Session
 }

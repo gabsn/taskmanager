@@ -2,14 +2,21 @@ package common
 
 import (
     "log"
+    "time"
     "io/ioutil"
+    "net/http"
 
-    jwt "github.com/dfrijalva/jwt-go"
+    jwt "github.com/dgrijalva/jwt-go"
+    "github.com/dgrijalva/jwt-go/request"
 )
 
 var (
     verifyKey, signKey []byte
 )
+
+type UserInfo struct {
+    Name, Role string
+}
 
 func initKeys() {
     var err error
@@ -17,20 +24,20 @@ func initKeys() {
     if err != nil {
         log.Fatal(err)
     }
-    privKey, err = ioutil.ReadFile("keys/app.rsa.pub")
+    verifyKey, err = ioutil.ReadFile("keys/app.rsa.pub")
     if err != nil {
         log.Fatal(err)
     }
 }
 
 func GenerateJWT(name, role string) (string, error) {
-    t := jwt.New(jwt.GetSigningMethod("RS256"))
-    t.Claims["iss"] = "admin"
-    t.Claims["UserInfo"] = struct {
-        Name, Role string
-    }{name, role}
-    t.Claims["exp"] = time.Now().Add(20 * time.Minute).Unix()
-    tokenString, err = t.SignedString(signKey)
+    token := jwt.New(jwt.SigningMethodRS256)
+    token.Claims = jwt.MapClaims{
+        "iss": "admin",
+        "UserInfo": UserInfo{name, role},
+        "exp": time.Now().Add(20 * time.Minute).Unix(),
+    }
+    tokenString, err := token.SignedString(signKey)
     if err != nil {
         return "", err
     } else {
@@ -40,9 +47,9 @@ func GenerateJWT(name, role string) (string, error) {
 
 // Authorization middleware
 func Authorize(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-    token, err := jwt.ParseFromRequest(r, func(token *jwt.Token) (interface{}, error) {
+    token, err := request.ParseFromRequest(r, request.OAuth2Extractor, func(token *jwt.Token) (interface{}, error) {
         return verifyKey, nil
-    }
+    })
     if err != nil {
         switch err.(type) {
         case *jwt.ValidationError:

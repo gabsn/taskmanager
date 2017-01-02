@@ -6,7 +6,7 @@ func StartUp() {
     // Initialize RSA keys for JWT Authentication
     initKeys()
     // Start a MongoDB session
-    createDBSession()
+    createDbSession()
     // Add indexes into MongoDB
     addIndexes()
 }

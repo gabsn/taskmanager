@@ -1,6 +1,7 @@
 package common
 
 import (
+    "log"
     "time"
     "gopkg.in/mgo.v2"
 )
@@ -16,7 +17,7 @@ func GetSession() *mgo.Session {
 
 func createDbSession() {
     var err error
-    session, err = mgo.DialWithInfo(*mgo.DialInfo{
+    session, err = mgo.DialWithInfo(&mgo.DialInfo{
         Addrs: []string{AppConfig.MongoDBHost},
         Username: AppConfig.DBUser,
         Password: AppConfig.DBPwd,
