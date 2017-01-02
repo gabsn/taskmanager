@@ -31,12 +31,11 @@ func initKeys() {
 }
 
 func GenerateJWT(name, role string) (string, error) {
-    token := jwt.New(jwt.SigningMethodRS256)
-    token.Claims = jwt.MapClaims{
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
         "iss": "admin",
         "UserInfo": UserInfo{name, role},
         "exp": time.Now().Add(20 * time.Minute).Unix(),
-    }
+    })
     tokenString, err := token.SignedString(signKey)
     if err != nil {
         return "", err

@@ -54,9 +54,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
     // Authenticate the login user
     if user, err := repo.Login(loginUser); err != nil {
-        common.DisplayAppError(w, err, "Incalid login credentials", 401)
+        common.DisplayAppError(w, err, "Invalid login credentials", 401)
         return
-    } else {
+    } else { // User authenticated
         token, err = common.GenerateJWT(user.Email, "member")
         if err != nil {
             common.DisplayAppError(w, err, "Error while generating the access token", 500)
